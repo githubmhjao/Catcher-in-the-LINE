@@ -1,0 +1,2 @@
+web: gunicorn app_day_19:app --preload
+clock: python clock.py
