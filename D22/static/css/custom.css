@@ -1,0 +1,16 @@
+.bg-dirty-purple {background-color: Indigo;}
+.btn-dirty-purple 
+{ 
+  color: #A179BE;
+  background-color: Indigo;
+}
+.btn-dirty-purple:hover 
+{
+  color: #D2BFE0;
+  text-decoration: none;
+}
+.desc {height: 20em;}
+.welcome {
+  height: 40em;
+  padding: 100px 100px 100px 100px;
+}
