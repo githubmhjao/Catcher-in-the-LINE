@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}賴田捕手：舒適地選擇訓練紀錄{% endblock %}
+
+{% block main %}
+
+{% macro easy_option_form(col_name, col_options) -%}
+  <div class="form-group row">
+    <label for="{{ col_name }}" class="col-2 offset-1 col-form-label">{{ col_name }} =</label>
+    <div class="col-3">
+      <select class="form-control" id="{{ col_name }}" name="{{ col_name }}">
+        <option selected value=''>所有資料</option>
+        {% for col_option in col_options %}
+        <option value="'{{ col_option }}'">{{ col_option }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+{%- endmacro %}
+
+
+<div class="container" style="margin: 4em auto">
+<div class="row">
+<div class="col">
+  <h1>選擇訓練紀錄</h1>
+  <h2>Postgres Select Query</h2>
+<form method="post" action="/select_records">
+  <div class="row"><div class="col-1">SELECT</div></div>
+  <div class="row"><div class="col-2 offset-1">*</div></div>
+  <div class="row"><div class="col-1">FROM</div></div>
+  <div class="row"><div class="col-2 offset-1">alpaca_training</div></div>  
+  <div class="row"><div class="col-1">WHERE</div></div>
+
+  {{ easy_option_form("alpaca_name", uniques[0]) }}
+
+  {{ easy_option_form("training", uniques[1]) }}
+
+  {{ easy_option_form("date", uniques[2]) }}
+
+  <button type="submit" class="btn btn-dirty-purple">查詢紀錄</button>
+</form>
+</div>
+</div>
+</div>
+
+{% endblock %}
