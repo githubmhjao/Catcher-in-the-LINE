@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}賴田捕手：選擇訓練紀錄{% endblock %}
+
+{% block main %}
+
+{% macro easy_text_form(col_name, note) -%}
+  <div class="form-group row">
+    <label for="{{ col_name }}" class="col-2 offset-1 col-form-label">{{ col_name }} =</label>
+    <div class="col-3">
+      <input type="text" class="form-control" id="{{ col_name }}" name="{{ col_name }}" placeholder="{{ col_name }}">
+      <small class="form-text">{{ note }}</small>
+    </div>
+  </div>
+{%- endmacro %}
+
+
+<div class="container" style="margin: 4em auto">
+<div class="row">
+<div class="col">
+
+  <h1>選擇訓練紀錄</h1>
+  <h2>Postgres Select Query</h2>
+
+<form method="post" action="/select_records">
+
+  <div class="row"><div class="col-1">SELECT</div></div>
+  <div class="row"><div class="col-2 offset-1">*</div></div>
+  <div class="row"><div class="col-1">FROM</div></div>
+  <div class="row"><div class="col-2 offset-1">alpaca_training</div></div>  
+  <div class="row"><div class="col-1">WHERE</div></div>
+
+  {{ easy_text_form("alpaca_name", "請輸入草泥馬的名字") }}
+
+  {{ easy_text_form("training", "請輸入訓練的名稱") }}
+
+  {{ easy_text_form("date", "請輸入訓練的日期") }}
+
+  <button type="submit" class="btn btn-dirty-purple">查詢紀錄</button>
+
+</form>
+
+</div>
+</div>
+</div>
+
+{% endblock %}
