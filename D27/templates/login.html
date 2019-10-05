@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}賴田捕手：使用者登入{% endblock %}
+
+{% block flash %}
+<div class = 'alert alert-warning'>
+  {% for message in messages %}
+    {{ message }}
+  {% endfor %}
+</div>
+{% endblock %}
+
+{% block main %}
+
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <div class = 'alert alert-warning'>
+      {% for message in messages %}
+        {{ message }}
+      {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+
+<div class="container" style="margin: 4em auto">
+<div class="row">
+<div class="col">
+
+  <h1>使用者登入</h1>
+
+<form method="post" action="/login">
+
+  <div class="form-group row">
+    <label for="user_id" class="col-2 offset-1 col-form-label">user_id:</label>
+    <div class="col-3">
+      <input type="text" class="form-control" id="user_id" name="user_id" placeholder="user_id">
+      <small class="form-text">提示： Me</small>
+    </div>
+  </div>
+  <div class="form-group row">
+    <label for="password" class="col-2 offset-1 col-form-label">password:</label>
+    <div class="col-3">
+      <input type="password" class="form-control" id="password" name="password" placeholder="password">
+      <small class="form-text">提示： myself</small>
+    </div>
+  </div>
+  <div class="form-group row">
+    <div class="col-2 offset-3">
+      <button type="submit" class="btn btn-dirty-purple">登入</button>
+    </div>
+  </div>
+</form>
+
+</div>
+</div>
+</div>
+
+{% endblock %}

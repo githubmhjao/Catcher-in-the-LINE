@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- 提供 ico 檔案 -->
+  <link rel="icon" href="{{ url_for('static', filename='img/alpaca_logo.ico') }}">
+
+  <!-- 引入 cdn CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Sans+TC&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.7.11/c3.min.css">  
+
+  <!-- 引入我們自己的 CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+
+  <!-- 直接定義 CSS -->
+  <style> body {font-family: 'Noto Sans TC', sans-serif;}</style>
+  <style> .btn-dirty-purple {color: #A179BE; background-color: Indigo;}</style>
+  <style> .btn-dirty-purple:hover {color: #D2BFE0; text-decoration: none;}</style>
+
+  <!-- 可供更改的部分 -->
+  <title>{% block title %}{% endblock %}</title>
+
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-md navbar-dark bg-dirty-purple">
+  <a class="navbar-brand" href="/">賴田捕手</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+
+    <!-- 登入後才可見到的導覽列 -->
+    {% if current_user.is_authenticated %}
+
+    <ul class="navbar-nav mr-auto">
+
+      <li class="nav-item">
+        <a class="nav-link" href="/from_start">從頭開始</span></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">LINE-Bot-Sdk</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">Heroku Postgres</a>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Flask
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" href="#">基本架構</a>
+          <a class="dropdown-item" href="#">網頁設計</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item disabled" href="#" tabindex="-1" aria-disabled="true">第 23 天</a>
+          <a class="dropdown-item" href="/show_records">訓練紀錄</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item disabled" href="#" tabindex="-1" aria-disabled="true">第 24 天</a>
+          <a class="dropdown-item" href="/select_records">選擇訓練紀錄</a>
+          <a class="dropdown-item" href="/select_records_comfortable">舒適地選擇訓練紀錄</a>
+        </div>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          DataVis
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item disabled" href="#" tabindex="-1" aria-disabled="true">第 27 天</a>
+          <a class="dropdown-item" href="/donut_chart">甜甜圈圖</a>
+        </div>
+      </li>
+    </ul>
+    {% endif %}
+
+    <ul class="navbar-nav ml-auto">
+    <li class="nav-item">
+
+    <!-- 登入後才可見到的導覽列 -->
+    {% if current_user.is_authenticated %}
+      <a class="nav-link" href="/logout">登出</a>
+    {% else %}
+      <a class="nav-link" href="/login">登入</a>
+    {% endif %}
+
+    </li>
+    </ul>
+  </div>
+  </nav>
+
+  <main>
+    {% block main %}{% endblock %}
+  </main>
+
+<footer class="fixed-bottom bg-light">
+  <div class="container-fluid">
+    <div class="row">
+    <div class="col">
+  <ul class="list-group list-group-horizontal">
+  <li class="list-group-item bg-light border-light"><a href="https://ithelp.ithome.com.tw/users/20120178/ironman/2654">iT邦幫忙鐵人賽</a></li>
+    <li class="list-group-item bg-light border-light"><a href="https://github.com/githubmhjao">Github</a></li>
+      </ul></div>
+      <div class="col">
+      <ul class="list-group list-group-horizontal">
+        <li class="list-group-item bg-light border-light">當前網站採用 Bootstrap v4.3.1 版本, <a href="https://github.com/twbs/bootstrap/blob/master/LICENSE" target="_blank" rel="license noopener">MIT</a>, docs <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="license noopener">CC BY 3.0</a>.</li>
+      </ul>
+      </div>
+  </div>
+</footer>
+
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.12.0/d3.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.7.11/c3.min.js"></script>
+
+  {% block script %}{% endblock %}
+</body>
+</html>

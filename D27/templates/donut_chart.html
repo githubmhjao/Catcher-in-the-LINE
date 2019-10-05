@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}賴田捕手：甜甜圈圖{% endblock %}
+
+{% block main %}
+
+<div class="container" style="margin: 4em auto">
+
+<div class="row">
+  <div class="col">
+    <h1>甜甜圈圖</h1>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col">
+  <h2>alpacaName</h2>
+  <div id="alpacaNameDonut"></div>
+  </div>
+  <div class="col">
+  <h2>training</h2>
+  <div id="trainingDonut"></div>
+  </div>
+</div>
+
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script>
+const table = {{ table|tojson }};
+const uniqueAlpacaName = {{ uniques[0]|tojson }};
+const uniqueTraining = {{ uniques[1]|tojson }};
+const uniqueDate = {{ uniques[2]|tojson }};
+
+let alpacaNameDaily = []
+uniqueAlpacaName.forEach(x => alpacaNameDaily.push([x].concat(uniqueDate.map(x => 0))))
+
+let alpacaNameIndex = alpacaNameDaily.map(x => x[0])
+
+let trainingDaily = []
+uniqueTraining.forEach(x => trainingDaily.push([x].concat(uniqueDate.map(x => 0))))
+
+let trainingIndex = trainingDaily.map(x => x[0])
+
+table.forEach(function (x) {
+  tempDate = uniqueDate.indexOf(x[4])+1;
+  tempName = alpacaNameIndex.indexOf(x[1]);
+  tempTraining = trainingIndex.indexOf(x[2]);
+
+  alpacaNameDaily[tempName][tempDate] += x[3];
+  trainingDaily[tempTraining][tempDate] += x[3];
+})
+
+
+var alpacaNameChart = c3.generate({
+    bindto: '#alpacaNameDonut',
+    data: {
+      columns: alpacaNameDaily,
+      type: 'donut'
+    },
+  donut: {
+  title: 'alpacaNameDonut'
+}
+});
+
+var trainingChart = c3.generate({
+    bindto: '#trainingDonut',
+    data: {
+      columns: trainingDaily,
+      type: 'donut'
+    },
+  donut: {
+  title: 'trainingDonut'
+}
+});
+</script>
+{% endblock %}
