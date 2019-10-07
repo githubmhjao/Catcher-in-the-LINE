@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block title %}賴田捕手：史丹佛圖{% endblock %}
+
+{% block main %}
+
+<div class="container" style="margin: 4em auto">
+
+<div class="row">
+  <div class="col">
+    <h1>史丹佛圖</h1>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col">
+  <h2>alpacaName</h2>
+  <div id="alpacaNameStanford"></div>
+  </div>
+  <div class="col">
+  <h2>training</h2>
+  <div id="trainingStanford"></div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-4 offset-1">
+    <div class="slidecontainer">
+    <input type="range" min="-1" max="53" value="-1" class="slider" id="alpacaNameRange">
+    </div>
+  </div>
+  <div class="col-4 offset-2">
+    <div class="slidecontainer">
+    <input type="range" min="-1" max="53" value="-1" class="slider" id="trainingRange">
+    </div>
+  </div>
+</div>
+
+<div class="row form-group">
+  <label class="col-2 offset-1" for="alpacaNameSelect">training: </label>
+  <label class="col-2 offset-4" for="trainingSelect">alpacaName: </label>
+</div>
+<div class="row form-group">
+  <div class="col-4 offset-1">
+    <select class="form-control" id="alpacaNameSelect">
+    <option value="overall" selected>Overall</option>
+    {% for unique in uniques[1] %}
+    <option value="{{ unique }}">{{ unique }}</option>
+    {% endfor %}
+    </select>
+  </div>
+  <div class="col-4 offset-2">
+    <select class="form-control" id="trainingSelect">
+    <option value="overall" selected>Overall</option>
+    {% for unique in uniques[0] %}
+    <option value"{{ unique }}">{{ unique }}</option>
+    {% endfor %}
+    </select>
+  </div>
+</div>
+
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script>
+const table = {{ table|tojson }};
+const uniqueAlpacaName = {{ uniques[0]|tojson }};
+const uniqueTraining = {{ uniques[1]|tojson }};
+const uniqueDate = {{ uniques[2]|tojson }};
+const uniqueIsocalendar = {{ uniques[3]|tojson }};
+
+// data for C3 columns
+function showOverall() {
+  let uniqueOverall = [['x'].concat(uniqueIsocalendar.map(x=>x[1])), 
+                       ['isoweekday'].concat(uniqueIsocalendar.map(x=>x[2])),
+                       ['Epochs'].concat(uniqueDate.map(x=>1))];
+
+  table.forEach(function (x) {
+    let tempDate = uniqueDate.indexOf(x[4])+1;
+
+    uniqueOverall[2][tempDate] += x[3]/60;
+  })
+  return uniqueOverall;
+}
+
+// data for C3 columns
+function showDetail(focus) {
+  let uniqueDetail = [['x'].concat(uniqueIsocalendar.map(x=>x[1])), 
+                      ['isoweekday'].concat(uniqueIsocalendar.map(x=>x[2])),
+                      ['Epochs'].concat(uniqueDate.map(x=>1))];
+
+  let tableDetail = table.filter(x => x.some(x => x === focus))
+  tableDetail.forEach(function (x) {
+    let tempDate = uniqueDate.indexOf(x[4])+1;
+
+    uniqueDetail[2][tempDate] += x[3]/60;
+  })
+  return uniqueDetail;
+}
+
+
+// C3 generate
+function c3Generate (bindto, columns, xMin) {
+  return c3.generate({
+    bindto: bindto,
+    data: { x: 'x', epochs: 'Epochs', columns: columns, type: 'stanford', onmouseover: function (d) {console.log(d)} },
+    legend: { hide: true },
+    point: { focus: { expand: { r: 10 } }, r: 5 },
+    axis: {
+        x: {
+          show: true, 
+          label: { text: 'isoWeekNumber', position: 'outer-center' },
+          min: xMin,
+          max: 53,
+          tick: { values: d3.range(0, 50, 5) },
+          padding: { top: 0, bottom: 0, left: 0, right: 0 },
+        },
+        y: {
+          show: true,
+          label: { text: 'isoWeekDay', position: 'outer-middle' },
+          min: 0,
+          max: 8,
+          tick: { values: d3.range(0, 8, 1) },
+          padding: { top: 5, bottom: 0, left: 0, right: 0 },
+        }
+    },
+    stanford: {
+        scaleMin: Math.min(...columns[2].slice(1)),
+        scaleMax: Math.max(...columns[2].slice(1)),
+        scaleFormat: 'pow10',
+        padding: { top: 15, right: 0, bottom: 0, left: 0 }
+    }
+  });
+}
+
+
+var alpacaNameChart = c3Generate('#alpacaNameStanford', showOverall(), -1)
+
+var trainingChart = c3Generate('#trainingStanford', showOverall(), -1)
+
+document.getElementById('alpacaNameSelect').onchange = function (e) {
+  console.log(e.target.value);
+  if (e.target.value !== 'overall') { c3Generate('#alpacaNameStanford', showDetail(e.target.value), -1) }
+  else { c3Generate('#alpacaNameStanford', showOverall(), -1) };
+  $('#alpacaNameRange')[0].value = -1;
+}
+
+document.getElementById('trainingSelect').onchange = function (e) {
+  console.log(e.target.value);
+  if (e.target.value !== 'overall') { c3Generate('#trainingStanford', showDetail(e.target.value), -1) }
+  else { c3Generate('#trainingStanford', showOverall(), -1) };
+  $('#trainingRange')[0].value = -1;
+}
+
+document.getElementById('alpacaNameRange').onchange = function (e) {
+  console.log(e.target.value)
+  if ($('#alpacaNameSelect')[0].value !== 'overall') { c3Generate('#alpacaNameStanford', showDetail($('#alpacaNameSelect')[0].value), e.target.value) }
+  else { c3Generate('#alpacaNameStanford', showOverall(), e.target.value) };
+}
+
+document.getElementById('trainingRange').onchange = function (e) {
+  console.log(e.target.value)
+  if ($('#trainingSelect')[0].value !== 'overall') { c3Generate('#trainingStanford', showDetail($('#trainingSelect')[0].value), e.target.value) }
+  else { c3Generate('#trainingStanford', showOverall(), e.target.value) };
+}
+
+</script>
+{% endblock %}

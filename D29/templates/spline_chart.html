@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block title %}賴田捕手：曲線圖{% endblock %}
+
+{% block main %}
+
+<div class="container" style="margin: 4em auto">
+
+<div style="margin: 4em auto">
+<div class="row">
+  <div class="col">
+    <h1>曲線圖</h1>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col">
+  <h2>alpacaName</h2>
+  <div id="alpacaNameSpline"></div>
+  </div>
+</div>
+
+<div class="row form-group">
+  <label class="col-2 col-form-label" for="alpacaNameSelect">查詢 training：</label>
+  <div class="col-3">
+          <select class="form-control" id="alpacaNameSelect">
+          <option value="overall" selected>Overall</option>
+          {% for label in uniques[1] %}
+          <option value="{{ label }}">{{ label }}</option>
+          {% endfor %}
+          </select>
+  </div>
+  <label class="col-1 col-form-label" for"alpacaNameStack">Stacked：</label>
+  <div class="col-2">
+          <select class="form-control" id="alpacaNameStack">
+          <option value="" selected>None</option>
+          <option value="true">Stacked</option>
+          </select>
+  </div>
+</div>
+</div>
+
+<div style="margin: 4em auto">
+<div class="row">
+  <div class="col">
+  <h2>training</h2>
+  <div id="trainingSpline"></div>
+  </div>
+</div>
+
+<div class="row form-group">
+  <label class="col-2 col-form-label" for="trainingSelect">查詢 alpacaName：</label>
+  <div class="col-3">
+          <select class="form-control" id="trainingSelect">
+          <option value="overall" selected>Overall</option>
+          {% for label in uniques[0] %}
+          <option value="{{ label }}">{{ label }}</option>
+          {% endfor %}
+          </select>
+  </div>
+  <label class="col-1 col-form-label" for"trainingStack">Stacked：</label>
+  <div class="col-2">
+          <select class="form-control" id="trainingStack">
+          <option value="" selected>None</option>
+          <option value="true">Stacked</option>
+          </select>
+  </div>
+</div>
+</div>
+
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script>
+const table = {{ table|tojson }};
+const uniqueAlpacaName = {{ uniques[0]|tojson }};
+const uniqueTraining = {{ uniques[1]|tojson }};
+const uniqueDate = {{ uniques[2]|tojson }};
+
+
+function showOverall (uniqueOverall, overallCol) {
+  let overallDaily = [['x'].concat(uniqueDate)];
+  uniqueOverall.forEach(x => overallDaily.push([x].concat(uniqueDate.map(x => 0))));
+
+  table.forEach(function(x) {
+    let tempDate = uniqueDate.indexOf(x[4])+1;
+    let tempOverall = overallDaily.map(x => x[0]).indexOf(x[overallCol]);
+
+    overallDaily[tempOverall][tempDate] += x[3]/60;
+  })
+  return overallDaily;
+}
+
+
+function showDetail (focus, uniqueDetail, detailCol) {
+  let detailDaily = [['x'].concat(uniqueDate)];
+  uniqueDetail.forEach(x => detailDaily.push([x].concat(uniqueDate.map(x => 0))));
+
+  tempFocus = table.filter(x => x.some(x => x===focus));
+
+  tempFocus.forEach(function (x) {
+    let tempDate = uniqueDate.indexOf(x[4])+1;
+    let tempDetail = detailDaily.map(x=>x[0]).indexOf(x[detailCol]);
+
+    detailDaily[tempDetail][tempDate] += x[3]/60;
+
+  })
+  return detailDaily;
+};
+
+
+function c3Generate(bindto, columns, stacked){
+  let c3Object = {
+    bindto: bindto,
+    data: { x: 'x', columns: columns, type: 'spline' },
+    axis: { x: { type: 'timeseries', tick: { format: '%Y-%m-%d' } } }
+  }
+
+  if (stacked) { 
+    c3Object['data']['groups'] = [columns.map(x => x[0]).slice(1)];
+    c3Object['data']['type'] = 'area-spline'
+  };
+  return c3.generate(c3Object);
+}
+
+var alpacaNameSpline = c3Generate('#alpacaNameSpline', showOverall(uniqueAlpacaName, 1), false)
+
+var trainingSpline = c3Generate('#trainingSpline', showOverall(uniqueTraining, 2), false)
+
+document.getElementById('alpacaNameSelect').onchange = function(e) {
+  console.log(e.target.value);
+  if (e.target.value !== 'overall') { alpacaNameSpline = c3Generate('#alpacaNameSpline', showDetail(e.target.value, uniqueAlpacaName, 1), false); }
+  else { alpacaNameSpline = c3Generate('#alpacaNameSpline', showOverall(uniqueAlpacaName, 1), false); };
+  $('#alpacaNameStack')[0].value = '';
+};
+
+document.getElementById('trainingSelect').onchange = function(e) {
+  console.log(e.target.value);
+  if (e.target.value !== 'overall') { trainingSpline = c3Generate('#trainingSpline', showDetail(e.target.value, uniqueTraining, 2), false); }
+  else { trainingSpline = c3Generate('#trainingSpline', showOverall(uniqueTraining, 2), false); };
+  $('#trainingStack')[0].value = '';
+};
+
+document.getElementById('alpacaNameStack').onchange = function(e) {
+  console.log(Boolean(e.target.value)==true);
+  let alpacaNameSelectValue = $('#alpacaNameSelect')[0].value
+  if ($('#alpacaNameSelect')[0].value !== 'overall') { alpacaNameSpline = c3Generate('#alpacaNameSpline', showDetail(alpacaNameSelectValue, uniqueAlpacaName, 1), e.target.value); }
+  else { alpacaNameSpline = c3Generate('#alpacaNameSpline', showOverall(uniqueAlpacaName, 1), e.target.value); }
+}
+
+document.getElementById('trainingStack').onchange = function(e) {
+  console.log(Boolean(e.target.value)==true);
+  let trainingSelectValue = $('#trainingSelect')[0].value
+  if (trainingSelectValue !== 'overall') { trainingSpline = c3Generate('#trainingSpline', showDetail(trainingSelectValue, uniqueTraining, 2), e.target.value); }
+  else { trainingSpline = c3Generate('#trainingSpline', showOverall(uniqueTraining, 2), e.target.value); }
+  
+}
+
+</script>
+{% endblock %}
